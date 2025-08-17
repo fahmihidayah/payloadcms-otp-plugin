@@ -81,7 +81,7 @@ const buildConfigWithMemoryDB = async () => {
           users: true
         },
         afterSetOtp: ({otp, credentials}) => {
-          
+          console.log("otp : ", otp)
         }
       }),
     ],

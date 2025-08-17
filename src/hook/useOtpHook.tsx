@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { toast, useTranslation } from "@payloadcms/ui"
 import { usePathname, useRouter } from "next/navigation.js";
 import { OtpTranslationsKeys, OtpTranslationsObject } from "src/translation/index.js";
-import { resendOtp, resetToken, submitOtp } from "src/actions/index.js";
+import { resendOtp, resetToken, sendOtp, submitOtp } from "../actions/index.js";
 
 export default function useOtpHook() {
 
@@ -19,15 +19,16 @@ export default function useOtpHook() {
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            const getOtp = async () => {
-                const currentOtp = await resetToken();
+            const initializeOtp = async () => {
+                const token = await resetToken();
+                if(!token) {
+                    router.push('/admin')
 
-                if (!currentOtp) {
-                    router.push("/admin/login");
                 }
             };
-            if (pathname === '/otp-validation') {
-                getOtp();
+            
+            if (pathname === '/otp-validation' || pathname === '/admin/otp-validation') {
+                initializeOtp();
             }
 
         }, 500); // debounce: 500ms delay
@@ -36,36 +37,42 @@ export default function useOtpHook() {
     }, [pathname]);
 
     const submit = async () => {
-
         try {
             const result = await submitOtp(currentOtp);
-            if (result) {
-                router.push("/admin");
+            if (result.success) {
+                toast.success(result.message);
+                // Get redirect params from URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const adminRedirect = urlParams.get('admin-redirect');
+                const redirectPath = adminRedirect || '/admin';
+                router.push(redirectPath);
             } else {
-                toast.error(t("otp:wrong_otp_code"));
+                toast.error(result.message || t("otp:wrong_otp_code"));
             }
         } catch (error) {
+            console.error('Error submitting OTP:', error);
             toast.error(t("otp:failed_submitting_otp"));
         }
-
     }
 
     const resendNewOtp = async () => {
-
         try {
             const result = await resendOtp();
-            if (result) {
-                toast.success(t("otp:new_otp_sent"));
+            if (result.success) {
+                toast.success(result.message || t("otp:new_otp_sent"));
                 setIsTimedOut(false);
                 setCurrentOtp('');
                 setResetKey(prev => prev + 1); // Trigger reset for both components
                 return true;
             } else {
-                toast.error(t("otp:session_ended"));
-                router.push("/admin/login");
+                toast.error(result.message || t("otp:session_ended"));
+                if (result.message.includes('token') || result.message.includes('expired')) {
+                    router.push("/admin/login");
+                }
                 return false;
             }
         } catch (error) {
+            console.error('Error resending OTP:', error);
             toast.error(t('otp:failed_to_send_otp'));
             return false;
         }

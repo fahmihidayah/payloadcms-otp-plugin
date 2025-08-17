@@ -9,6 +9,7 @@
     "failed_submitting_otp" : "Failed to submit OTP",
     "new_otp_sent" : "New OTP sent to your email",
     "session_ended" : "Your session has ended.",
-    "failed_to_send_otp" : "Failed to resend OTP"
+    "failed_to_send_otp" : "Failed to resend OTP",
+    "otp_sent_successfully": "OTP sent successfully to your email"
   }
 }
