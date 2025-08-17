@@ -237,16 +237,22 @@ export async function resendOtp(): Promise<{ success: boolean; message: string }
   return await sendOtp();
 }
 
-export async function getOtpConfig(): Promise<number | undefined> {
+export interface OtpConfig {
+  otpLength: number;
+  expiredTime: number;
+}
+
+export async function getOtpConfig(): Promise<OtpConfig | undefined> {
   const baseUrl = await getBaseUrl();
   const response = await fetch(`${baseUrl}/api/otp/config`);
   
   if (response.ok) {
     const result: BaseResponse<{
-      otpLength: number
+      otpLength: number;
+      expiredTime: number;
     }> = await response.json();
     console.log('response ', result)
-    return result.data.otpLength
+    return result.data
   }
 
 }

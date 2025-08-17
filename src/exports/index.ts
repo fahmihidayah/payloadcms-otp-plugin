@@ -11,3 +11,7 @@ export {
 export { default as OtpPage } from '../components/otp/otp-page.js'
 export { default as OtpView } from '../components/otp/otp-view.js'
 export { default as OTPInput } from '../components/otp/otp-input.js'
+
+// Actions and Types
+export { getOtpConfig, sendOtp, submitOtp, resendOtp, resetToken } from '../actions/index.js'
+export type { OtpConfig } from '../actions/index.js'

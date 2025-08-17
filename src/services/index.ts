@@ -57,7 +57,9 @@ export class OTPService {
     }
 
     private async storeOTP(credentials: OTPCredentials, code: string): Promise<any> {
-        const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+        // Get expiredTime from plugin configuration (in milliseconds)
+        const expiredTime = this.payload.otpPluginConfig?.expiredTime || 300000; // Default 5 minutes
+        const expiresAt = new Date(Date.now() + expiredTime);
 
         const otpRecord = await this.payload.create({
             collection: 'otpCode',

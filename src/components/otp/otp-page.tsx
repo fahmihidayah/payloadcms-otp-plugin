@@ -8,16 +8,19 @@ interface OtpPageProps {
 }
 
 const OtpPage: React.FC<OtpPageProps> = async ({ 
-  initialTimer = 120, 
+  initialTimer, 
   className = '' 
 }) => {
   // Fetch OTP configuration on the server
-  const otpLength = await getOtpConfig() || 6;
+  const config = await getOtpConfig();
+  const otpLength = config?.otpLength || 6;
+  const expiredTime = config ? Math.floor(config.expiredTime / 1000) : (initialTimer || 120); // Convert to seconds
 
   return (
     <OtpView 
       otpLength={otpLength}
-      initialTimer={initialTimer}
+      expiredTime={expiredTime}
+      initialTimer={initialTimer} // Keep for fallback
       className={className}
     />
   );

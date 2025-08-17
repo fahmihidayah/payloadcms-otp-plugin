@@ -81,8 +81,9 @@ export const getOtpConfigEndpointHandler: PayloadHandler = async (req: PayloadRe
   try {
     const config = req.payload.otpPluginConfig;
     const otpLength = config?.otpLength || 6;
+    const expiredTime = config?.expiredTime || 300000; // Default 5 minutes
 
-    const response = createResponse({ otpLength }, "OTP configuration retrieved successfully", true);
+    const response = createResponse({ otpLength, expiredTime }, "OTP configuration retrieved successfully", true);
     return Response.json(response, { status: 200 });
 
   } catch (error) {

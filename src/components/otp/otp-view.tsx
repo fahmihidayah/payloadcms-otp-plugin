@@ -7,19 +7,21 @@ import OTPInput from './otp-input.js';
 import TimerCountdown from './timer-count-down.js';
 import useOtpHook from '../../hook/useOtpHook.js';
 import { OtpTranslationsKeys, OtpTranslationsObject } from 'src/translation/index.js';
-import { getOtpConfig } from '../../actions/index.js';
+import { getOtpConfig, OtpConfig } from '../../actions/index.js';
 
 // Type definitions
 interface OTPViewProps {
   initialTimer?: number;
   className?: string;
   otpLength?: number;
+  expiredTime?: number;
 }
 
 function OtpView({
-  initialTimer = 120,
+  initialTimer,
   className = '',
-  otpLength: propOtpLength
+  otpLength: propOtpLength,
+  expiredTime: propExpiredTime
 }: OTPViewProps) {
 
   const {
@@ -34,20 +36,24 @@ function OtpView({
 
   const { t } = useTranslation<OtpTranslationsObject, OtpTranslationsKeys>();
   const [otpLength, setOtpLength] = useState(propOtpLength || 6);
-  const [isConfigLoaded, setIsConfigLoaded] = useState(!!propOtpLength);
+  const [expiredTime, setExpiredTime] = useState(propExpiredTime || initialTimer || 120);
+  const [isConfigLoaded, setIsConfigLoaded] = useState(!!(propOtpLength && propExpiredTime));
 
-  // Fetch OTP configuration only if not provided as prop
+  // Fetch OTP configuration only if not provided as props
   useEffect(() => {
-    if (!propOtpLength) {
+    if (!propOtpLength || !propExpiredTime) {
       const fetchOtpConfig = async () => {
         try {
-          const configLength = await getOtpConfig();
-          if (configLength) {
-            setOtpLength(configLength);
+          const config = await getOtpConfig();
+          if (config) {
+            if (!propOtpLength) setOtpLength(config.otpLength);
+            if (!propExpiredTime) setExpiredTime(Math.floor(config.expiredTime / 1000)); // Convert to seconds for timer
           }
         } catch (error) {
           console.error('Failed to fetch OTP config:', error);
-          // Keep default length of 6 if fetch fails
+          // Keep defaults if fetch fails
+          if (!propOtpLength) setOtpLength(6);
+          if (!propExpiredTime) setExpiredTime(initialTimer || 120);
         } finally {
           setIsConfigLoaded(true);
         }
@@ -55,7 +61,7 @@ function OtpView({
 
       fetchOtpConfig();
     }
-  }, [propOtpLength]);
+  }, [propOtpLength, propExpiredTime, initialTimer]);
 
   // Handle OTP input change
   const handleOtpChange = (otp: string): void => {
@@ -110,7 +116,7 @@ function OtpView({
         <div className="otp__timer-section">
           <TimerCountdown
             key={resetKey}
-            initialTimer={initialTimer}
+            initialTimer={expiredTime}
             onExpired={handleTimerExpired}
             onResend={handleResendCode}
             className="otp__timer"

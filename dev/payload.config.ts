@@ -76,7 +76,7 @@ const buildConfigWithMemoryDB = async () => {
     plugins: [
       otpPlugin({
         otpLength: 5,
-        expiredTime: 1234,
+        expiredTime: 300 * 1000,
         disabled : false, 
         collections: {
           users: true
