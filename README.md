@@ -1,218 +1,316 @@
-# Payload Plugin Template
+# Payload CMS OTP Authentication Plugin
 
-A template repo to create a [Payload CMS](https://payloadcms.com) plugin.
+A comprehensive One-Time Password (OTP) authentication plugin for Payload CMS that enables secure passwordless authentication via SMS and email.
 
-Payload is built with a robust infrastructure intended to support Plugins with ease. This provides a simple, modular, and reusable way for developers to extend the core capabilities of Payload.
+## Features
 
-To build your own Payload plugin, all you need is:
+- 🔐 **Passwordless Authentication**: Secure login using OTP codes
+- 📱 **Multi-Channel Support**: SMS and email OTP delivery
+- ⚡ **Easy Integration**: Simple plugin configuration
+- 🎯 **Flexible Hooks**: Customizable `afterSetOtp` hook for integrations
+- 🔧 **TypeScript Support**: Full TypeScript support with proper type definitions
+- 🛡️ **Security**: Automatic OTP expiration and cleanup
+- 🏗️ **Payload 3.x Compatible**: Built for the latest Payload CMS
 
-- An understanding of the basic Payload concepts
-- And some JavaScript/Typescript experience
+## Installation
 
-## Background
+```bash
+npm install @payloadcms/otp-plugin
+# or
+yarn add @payloadcms/otp-plugin
+# or
+pnpm add @payloadcms/otp-plugin
+```
 
-Here is a short recap on how to integrate plugins with Payload, to learn more visit the [plugin overview page](https://payloadcms.com/docs/plugins/overview).
+## Quick Start
 
-### How to install a plugin
+### 1. Basic Configuration
 
-To install any plugin, simply add it to your payload.config() in the Plugin array.
+Add the plugin to your Payload configuration:
 
-```ts
-import myPlugin from 'my-plugin'
+```typescript
+import { buildConfig } from 'payload'
+import { otpPlugin } from '@payloadcms/otp-plugin'
 
-export const config = buildConfig({
+export default buildConfig({
+  // ... your existing config
   plugins: [
-    // You can pass options to the plugin
-    myPlugin({
-      enabled: true,
-    }),
-  ],
+    otpPlugin({
+      collections: { users: true },
+      expiredTime: 300000, // 5 minutes
+    })
+  ]
 })
 ```
 
-### Initialization
+### 2. Enhanced Configuration with Custom Hook
 
-The initialization process goes in the following order:
+```typescript
+import { buildConfig } from 'payload'
+import { otpPlugin } from '@payloadcms/otp-plugin'
+import { sendSMS, sendEmail } from './your-services'
 
-1. Incoming config is validated
-2. **Plugins execute**
-3. Default options are integrated
-4. Sanitization cleans and validates data
-5. Final config gets initialized
+export default buildConfig({
+  plugins: [
+    otpPlugin({
+      collections: { users: true },
+      expiredTime: 300000, // 5 minutes in milliseconds
+      afterSetOtp: async ({ otp, credentials, otpRecord, payload, req }) => {
+        // Send OTP via SMS or Email
+        if (credentials.mobile) {
+          await sendSMS(credentials.mobile, `Your OTP code is: ${otp}`)
+        } else if (credentials.email) {
+          await sendEmail(credentials.email, 'Your OTP Code', `Your verification code is: ${otp}`)
+        }
 
-## Building the Plugin
-
-When you build a plugin, you are purely building a feature for your project and then abstracting it outside of the project.
-
-### Template Files
-
-In the Payload [plugin template](https://github.com/payloadcms/payload/tree/main/templates/plugin), you will see a common file structure that is used across all plugins:
-
-1. root folder
-2. /src folder
-3. /dev folder
-
-#### Root
-
-In the root folder, you will see various files that relate to the configuration of the plugin. We set up our environment in a similar manner in Payload core and across other projects, so hopefully these will look familiar:
-
-- **README**.md\* - This contains instructions on how to use the template. When you are ready, update this to contain instructions on how to use your Plugin.
-- **package**.json\* - Contains necessary scripts and dependencies. Overwrite the metadata in this file to describe your Plugin.
-- .**eslint**.config.js - Eslint configuration for reporting on problematic patterns.
-- .**gitignore** - List specific untracked files to omit from Git.
-- .**prettierrc**.json - Configuration for Prettier code formatting.
-- **tsconfig**.json - Configures the compiler options for TypeScript
-- .**swcrc** - Configuration for SWC, a fast compiler that transpiles and bundles TypeScript.
-- **vitest**.config.js - Config file for Vitest, defining how tests are run and how modules are resolved
-
-**IMPORTANT\***: You will need to modify these files.
-
-#### Dev
-
-In the dev folder, you’ll find a basic payload project, created with `npx create-payload-app` and the blank template.
-
-**IMPORTANT**: Make a copy of the `.env.example` file and rename it to `.env`. Update the `DATABASE_URI` to match the database you are using and your plugin name. Update `PAYLOAD_SECRET` to a unique string.
-**You will not be able to run `pnpm/yarn dev` until you have created this `.env` file.**
-
-`myPlugin` has already been added to the `payload.config()` file in this project.
-
-```ts
-plugins: [
-  myPlugin({
-    collections: {
-      posts: true,
-    },
-  }),
-]
+        // Optional: Log OTP creation for analytics
+        console.log(`OTP ${otp} created for ${credentials.mobile || credentials.email}`)
+      }
+    })
+  ]
+})
 ```
 
-Later when you rename the plugin or add additional options, **make sure to update it here**.
+## API Endpoints
 
-You may wish to add collections or expand the test project depending on the purpose of your plugin. Just make sure to keep this dev environment as simplified as possible - users should be able to install your plugin without additional configuration required.
+The plugin automatically adds these endpoints to your Payload API:
 
-When you’re ready to start development, initiate the project with `pnpm/npm/yarn dev` and pull up [http://localhost:3000](http://localhost:3000) in your browser.
+### Send OTP
+```http
+POST /api/otp/send
+Content-Type: application/json
 
-#### Src
-
-Now that we have our environment setup and we have a dev project ready to - it’s time to build the plugin!
-
-**index.ts**
-
-The essence of a Payload plugin is simply to extend the payload config - and that is exactly what we are doing in this file.
-
-```ts
-export const myPlugin =
-  (pluginOptions: MyPluginConfig) =>
-  (config: Config): Config => {
-    // do cool stuff with the config here
-
-    return config
-  }
-```
-
-First, we receive the existing payload config along with any plugin options.
-
-From here, you can extend the config as you wish.
-
-Finally, you return the config and that is it!
-
-##### Spread Syntax
-
-Spread syntax (or the spread operator) is a feature in JavaScript that uses the dot notation **(...)** to spread elements from arrays, strings, or objects into various contexts.
-
-We are going to use spread syntax to allow us to add data to existing arrays without losing the existing data. It is crucial to spread the existing data correctly – else this can cause adverse behavior and conflicts with Payload config and other plugins.
-
-Let’s say you want to build a plugin that adds a new collection:
-
-```ts
-config.collections = [
-  ...(config.collections || []),
-  // Add additional collections here
-]
-```
-
-First we spread the `config.collections` to ensure that we don’t lose the existing collections, then you can add any additional collections just as you would in a regular payload config.
-
-This same logic is applied to other properties like admin, hooks, globals:
-
-```ts
-config.globals = [
-  ...(config.globals || []),
-  // Add additional globals here
-]
-
-config.hooks = {
-  ...(incomingConfig.hooks || {}),
-  // Add additional hooks here
+{
+  "mobile": "+1234567890"  // or "email": "user@example.com"
 }
 ```
 
-Some properties will be slightly different to extend, for instance the onInit property:
-
-```ts
-import { onInitExtension } from './onInitExtension' // example file
-
-config.onInit = async (payload) => {
-  if (incomingConfig.onInit) await incomingConfig.onInit(payload)
-  // Add additional onInit code by defining an onInitExtension function
-  onInitExtension(pluginOptions, payload)
+**Response:**
+```json
+{
+  "data": null,
+  "message": "OTP sent successfully",
+  "code": 200,
+  "error": false
 }
 ```
 
-If you wish to add to the onInit, you must include the **async/await**. We don’t use spread syntax in this case, instead you must await the existing `onInit` before running additional functionality.
+### Login with OTP
+```http
+POST /api/otp/login
+Content-Type: application/json
 
-In the template, we have stubbed out some addition `onInit` actions that seeds in a document to the `plugin-collection`, you can use this as a base point to add more actions - and if not needed, feel free to delete it.
-
-##### Types.ts
-
-If your plugin has options, you should define and provide types for these options.
-
-```ts
-export type MyPluginConfig = {
-  /**
-   * List of collections to add a custom field
-   */
-  collections?: Partial<Record<CollectionSlug, true>>
-  /**
-   * Disable the plugin
-   */
-  disabled?: boolean
+{
+  "mobile": "+1234567890",  // or "email": "user@example.com"
+  "otp": "123456"
 }
 ```
 
-If possible, include JSDoc comments to describe the options and their types. This allows a developer to see details about the options in their editor.
+**Response:**
+```json
+{
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "user": {
+      "id": "user_id",
+      "email": "user@example.com",
+      "mobile": "+1234567890"
+    }
+  },
+  "message": "Login successful",
+  "code": 200,
+  "error": false
+}
+```
 
-##### Testing
+## Configuration Options
 
-Having a test suite for your plugin is essential to ensure quality and stability. **Vitest** is a fast, modern testing framework that works seamlessly with Vite and supports TypeScript out of the box.
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `collections` | `Partial<Record<CollectionSlug, true>>` | - | Collections to enhance with OTP functionality |
+| `disabled` | `boolean` | `false` | Disable the plugin |
+| `expiredTime` | `number` | - | OTP expiration time in milliseconds |
+| `afterSetOtp` | `AfterSetOtpHook` | `undefined` | Hook executed after OTP creation |
 
-Vitest organizes tests into test suites and cases, similar to other testing frameworks. We recommend creating individual tests based on the expected behavior of your plugin from start to finish.
+### AfterSetOtp Hook
 
-Writing tests with Vitest is very straightforward, and you can learn more about how it works in the [Vitest documentation.](https://vitest.dev/)
+The `afterSetOtp` hook provides access to:
 
-For this template, we stubbed out `int.spec.ts` in the `dev` folder where you can write your tests.
+```typescript
+type AfterSetOtpHook = (args: {
+  otp: string;                                    // Generated OTP code
+  credentials: { mobile?: string; email?: string }; // User credentials
+  otpRecord: any;                                 // Database OTP record
+  payload: any;                                   // Payload CMS instance
+  req: any;                                       // Request object
+}) => Promise<void> | void;
+```
 
-```ts
-describe('Plugin tests', () => {
-  // Create tests to ensure expected behavior from the plugin
-  it('some condition that must be met', () => {
-   // Write your test logic here
-   expect(...)
+## Integration Examples
+
+### SMS Integration with Twilio
+
+```typescript
+import twilio from 'twilio'
+
+const client = twilio(process.env.TWILIO_SID, process.env.TWILIO_TOKEN)
+
+const sendSMS = async (mobile: string, message: string) => {
+  await client.messages.create({
+    body: message,
+    from: process.env.TWILIO_PHONE,
+    to: mobile
   })
-})
+}
+
+// In your plugin configuration
+afterSetOtp: async ({ otp, credentials }) => {
+  if (credentials.mobile) {
+    await sendSMS(credentials.mobile, `Your verification code: ${otp}`)
+  }
+}
 ```
 
-## Best practices
+### Email Integration with SendGrid
 
-With this tutorial and the plugin template, you should have everything you need to start building your own plugin.
-In addition to the setup, here are other best practices aim we follow:
+```typescript
+import sgMail from '@sendgrid/mail'
 
-- **Providing an enable / disable option:** For a better user experience, provide a way to disable the plugin without uninstalling it. This is especially important if your plugin adds additional webpack aliases, this will allow you to still let the webpack run to prevent errors.
-- **Include tests in your GitHub CI workflow**: If you’ve configured tests for your package, integrate them into your workflow to run the tests each time you commit to the plugin repository. Learn more about [how to configure tests into your GitHub CI workflow.](https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs)
-- **Publish your finished plugin to NPM**: The best way to share and allow others to use your plugin once it is complete is to publish an NPM package. This process is straightforward and well documented, find out more [creating and publishing a NPM package here.](https://docs.npmjs.com/creating-and-publishing-scoped-public-packages/).
-- **Add payload-plugin topic tag**: Apply the tag **payload-plugin **to your GitHub repository. This will boost the visibility of your plugin and ensure it gets listed with [existing payload plugins](https://github.com/topics/payload-plugin).
-- **Use [Semantic Versioning](https://semver.org/) (SemVar)** - With the SemVar system you release version numbers that reflect the nature of changes (major, minor, patch). Ensure all major versions reference their Payload compatibility.
+sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
-# Questions
+const sendEmail = async (email: string, otp: string) => {
+  await sgMail.send({
+    to: email,
+    from: process.env.FROM_EMAIL,
+    subject: 'Your Verification Code',
+    html: `<p>Your verification code is: <strong>${otp}</strong></p>`
+  })
+}
 
-Please contact [Payload](mailto:dev@payloadcms.com) with any questions about using this plugin template.
+// In your plugin configuration
+afterSetOtp: async ({ otp, credentials }) => {
+  if (credentials.email) {
+    await sendEmail(credentials.email, otp)
+  }
+}
+```
+
+## Frontend Integration
+
+### React Example
+
+```typescript
+import { useState } from 'react'
+
+const OTPLogin = () => {
+  const [phone, setPhone] = useState('')
+  const [otp, setOtp] = useState('')
+  const [otpSent, setOtpSent] = useState(false)
+
+  const sendOTP = async () => {
+    const response = await fetch('/api/otp/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mobile: phone })
+    })
+    
+    if (response.ok) {
+      setOtpSent(true)
+    }
+  }
+
+  const login = async () => {
+    const response = await fetch('/api/otp/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mobile: phone, otp })
+    })
+    
+    const data = await response.json()
+    if (data.data?.token) {
+      localStorage.setItem('token', data.data.token)
+      // Redirect to authenticated area
+    }
+  }
+
+  return (
+    <div>
+      {!otpSent ? (
+        <div>
+          <input
+            type="tel"
+            placeholder="Phone number"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+          />
+          <button onClick={sendOTP}>Send OTP</button>
+        </div>
+      ) : (
+        <div>
+          <input
+            type="text"
+            placeholder="Enter OTP"
+            value={otp}
+            onChange={(e) => setOtp(e.target.value)}
+          />
+          <button onClick={login}>Login</button>
+        </div>
+      )}
+    </div>
+  )
+}
+```
+
+## Security Features
+
+- **Automatic Expiration**: OTPs expire after the configured time
+- **One-Time Use**: OTPs are marked as verified after successful use
+- **Cleanup**: Expired OTPs are automatically removed
+- **Access Control**: Proper authentication bypass for OTP endpoints
+- **JWT Integration**: Secure token generation with session management
+
+## Development
+
+### Building the Plugin
+
+```bash
+pnpm install
+pnpm build
+```
+
+### Running Tests
+
+```bash
+pnpm test
+```
+
+### Development Server
+
+```bash
+pnpm dev
+```
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+MIT
+
+## Author
+
+**Muhammad Fahmi Hidayah**  
+Email: m.fahmi.hidayah@gmail.com
+
+## Support
+
+If you encounter any issues or have questions, please:
+
+1. Check the [documentation](https://github.com/your-username/payload-otp-plugin)
+2. Search [existing issues](https://github.com/your-username/payload-otp-plugin/issues)
+3. Create a [new issue](https://github.com/your-username/payload-otp-plugin/issues/new)
+
+---
+
+Built with ❤️ for the Payload CMS community
