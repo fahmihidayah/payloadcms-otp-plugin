@@ -3,12 +3,12 @@ import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { MongoMemoryReplSet } from 'mongodb-memory-server'
 import path from 'path'
 import { buildConfig } from 'payload'
-import { otpPlugin } from 'otp-plugin'
 import sharp from 'sharp'
 import { fileURLToPath } from 'url'
 
 import { testEmailAdapter } from './helpers/testEmailAdapter.js'
 import { seed } from './seed.js'
+import { otpPlugin } from 'otp-plugin'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -17,7 +17,9 @@ if (!process.env.ROOT_DIR) {
   process.env.ROOT_DIR = dirname
 }
 
+
 const buildConfigWithMemoryDB = async () => {
+  console.log("process " + process.env.PAYLOAD_SECRET)
   if (process.env.NODE_ENV === 'test') {
     const memoryDB = await MongoMemoryReplSet.create({
       replSet: {
@@ -37,8 +39,22 @@ const buildConfigWithMemoryDB = async () => {
     },
     collections: [
       {
+        slug: 'users',
+        auth: true,
+        fields: [
+          {
+            name: 'email',
+            type: 'email',
+            required: true,
+          },
+        ],
+      },
+      {
         slug: 'posts',
         fields: [],
+        access : {
+          read : ({req}) => Boolean(req.user)
+        }
       },
       {
         slug: 'media',
@@ -59,9 +75,14 @@ const buildConfigWithMemoryDB = async () => {
     },
     plugins: [
       otpPlugin({
+        expiredTime: 1234,
+        disabled : false, 
         collections: {
-          posts: true,
+          users: true
         },
+        afterSetOtp: ({otp, credentials}) => {
+          
+        }
       }),
     ],
     secret: process.env.PAYLOAD_SECRET || 'test-secret_key',

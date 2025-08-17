@@ -1,4 +1,4 @@
-import type { ServerFunctionClient } from 'payload'
+import { getPayload, type ServerFunctionClient } from 'payload'
 
 import '@payloadcms/next/css'
 /* THIS FILE WAS GENERATED AUTOMATICALLY BY PAYLOAD. */
@@ -16,6 +16,7 @@ type Args = {
 
 const serverFunction: ServerFunctionClient = async function (args) {
   'use server'
+  const payload = await getPayload({config})
   return handleServerFunctions({
     ...args,
     config,

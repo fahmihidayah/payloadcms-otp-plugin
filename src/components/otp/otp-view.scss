@@ -1,0 +1,299 @@
+// Variables
+$font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+$primary-color: #333333;
+$bg-color: #fafafa;
+$input-bg: #ffffff;
+$border-color: #e5e5e5;
+$focus-color: #000000;
+$border-radius: 6px;
+$error-color: #ef4444;
+$success-color: #000000;
+$text-muted: #6b7280;
+
+// Mixins
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin button-reset {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+// Main OTP View Container
+.otp {
+  @include flex-center;
+  min-height: 100vh;
+  background-color: $bg-color;
+  font-family: $font-family;
+  padding: 25px;
+
+  &__container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    max-width: 400px;
+    width: 100%;
+  }
+
+  &__timer-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    text-align: center;
+    width: 100%;
+  }
+}
+
+// OTP Input Component Styles
+.otp-input {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+
+  &__container {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+  }
+
+  &__field {
+    width: 60px;
+    height: 60px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: 600;
+    border: 1px solid $border-color;
+    background-color: $input-bg;
+    color: $primary-color;
+    border-radius: $border-radius;
+    font-family: $font-family;
+    transition: all 0.2s ease;
+
+    &:hover:not(:disabled) {
+      border-color: $primary-color;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    &:focus {
+      outline: none;
+      border-color: $focus-color;
+      box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.2);
+    }
+
+    &--disabled {
+      background-color: #f8f9fa;
+      color: #adb5bd;
+      cursor: not-allowed;
+      border-color: #dee2e6;
+
+      &:hover {
+        border-color: #dee2e6;
+        box-shadow: none;
+      }
+    }
+  }
+}
+
+// Timer Countdown Component Styles
+.timer-countdown {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+
+  &__active {
+    color: $primary-color;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0;
+
+    strong {
+      color: $primary-color;
+      font-weight: 700;
+    }
+  }
+
+  &__expired {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  &__expired-message {
+    color: $error-color;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__resend-btn {
+    @include button-reset;
+    color: $primary-color;
+    font-size: 14px;
+    font-weight: 600;
+    transition: color 0.2s ease;
+    margin-top: 8px;
+
+    &:hover:not(:disabled) {
+      color: $primary-color;
+    }
+
+    &:focus {
+      outline: 2px solid $primary-color;
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+
+    &:disabled {
+      color: #adb5bd;
+      cursor: not-allowed;
+    }
+
+    &--underline {
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+  }
+}
+
+// Submit Button Styles (for PayloadCMS Button override)
+.otp__timer-section {
+  .btn {
+    background-color: $primary-color;
+    color: white;
+    padding: 14px 32px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    border-radius: $border-radius;
+    cursor: pointer;
+    font-family: $font-family;
+    transition: all 0.2s ease;
+    min-width: 120px;
+
+    &:hover:not(:disabled) {
+      background-color: #555555;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    &:focus {
+      outline: 2px solid $primary-color;
+      outline-offset: 2px;
+    }
+
+    &:disabled {
+      background-color: #adb5bd;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+  }
+}
+
+// Mobile Responsive Design
+@media (max-width: 768px) {
+  .otp {
+    padding: 15px;
+
+    &__container {
+      gap: 25px;
+      max-width: 350px;
+    }
+
+    &__timer-section {
+      gap: 18px;
+    }
+  }
+
+  .otp-input {
+    &__container {
+      gap: 10px;
+    }
+
+    &__field {
+      width: 45px;
+      height: 45px;
+      font-size: 18px;
+    }
+  }
+
+  .timer-countdown {
+    &__active,
+    &__expired-message {
+      font-size: 13px;
+    }
+
+    &__resend-btn {
+      font-size: 13px;
+    }
+  }
+
+  .otp__timer-section .btn {
+    padding: 12px 24px;
+    font-size: 13px;
+    min-width: 100px;
+  }
+}
+
+// Small Mobile Devices
+@media (max-width: 480px) {
+  .otp {
+    padding: 10px;
+
+    &__container {
+      gap: 20px;
+    }
+  }
+
+  .otp-input {
+    &__container {
+      gap: 8px;
+    }
+
+    &__field {
+      width: 40px;
+      height: 40px;
+      font-size: 16px;
+    }
+  }
+}
+
+// Accessibility Improvements
+@media (prefers-reduced-motion: reduce) {
+  .otp-input__field,
+  .timer-countdown__resend-btn,
+  .otp__timer-section .btn {
+    transition: none;
+  }
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .otp-input__field {
+    border-width: 2px;
+    
+    &:focus {
+      border-width: 3px;
+    }
+  }
+}

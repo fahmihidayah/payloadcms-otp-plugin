@@ -1,13 +1,41 @@
 import type { CollectionSlug, Config } from 'payload'
 
-import { customEndpointHandler } from './endpoints/customEndpointHandler.js'
+// Type augmentation for Payload
+declare module 'payload' {
+  interface BasePayload {
+    otpPluginHooks?: {
+      afterSetOtp?: AfterSetOtpHook;
+    };
+  }
+}
+
+// import { loginWithMobileEndpointHandler, resendOtpEndpointHandler, submitOtpEndpointHandler } from './endpoints/customEndpointHandler.js'
+import { OtpCode } from './collections/OtpCode.js'
+import { enhanceUsersCollection } from './collections/enhanceUserCollection.js'
+import { 
+  sendOtpEndpointHandler, 
+  loginWithMobileEndpointHandler,
+} from './endpoints/customEndpointHandler.js'
+
+export type AfterSetOtpHook = (args: {
+  otp: string;
+  credentials: { mobile?: string; email?: string };
+  otpRecord: any;
+  payload: any;
+  req: any;
+}) => Promise<void> | void;
 
 export type OtpPluginConfig = {
   /**
    * List of collections to add a custom field
    */
   collections?: Partial<Record<CollectionSlug, true>>
-  disabled?: boolean
+  disabled?: boolean,
+  expiredTime: number,
+  /**
+   * Hook executed after OTP is created and stored
+   */
+  afterSetOtp?: AfterSetOtpHook,
 }
 
 export const otpPlugin =
@@ -17,34 +45,28 @@ export const otpPlugin =
       config.collections = []
     }
 
-    config.collections.push({
-      slug: 'plugin-collection',
-      fields: [
-        {
-          name: 'id',
-          type: 'text',
-        },
-      ],
-    })
+    // Create OTP Code collection with plugin options
+    // const otpCodeCollection = createOtpCodeCollection({
+    //   ...pluginOptions.otpCodeCollection,
+    //   expiredTime: pluginOptions.expiredTime,
+    // })
+    
+    config.collections.push(OtpCode)
 
+    // Enhance collections specified in plugin options
     if (pluginOptions.collections) {
-      for (const collectionSlug in pluginOptions.collections) {
-        const collection = config.collections.find(
-          (collection) => collection.slug === collectionSlug,
-        )
-
-        if (collection) {
-          collection.fields.push({
-            name: 'addedByPlugin',
-            type: 'text',
-            admin: {
-              position: 'sidebar',
-            },
-          })
+      config.collections = config.collections.map((collection) => {
+        if (pluginOptions.collections && pluginOptions.collections[collection.slug]) {
+          // If it's the users collection, enhance it with OTP functionality
+          if (collection.slug === 'users') {
+            return enhanceUsersCollection(collection)
+          }
+          // For other collections, you could add other enhancements here
         }
-      }
+        return collection
+      })
     }
-
+  
     /**
      * If the plugin is disabled, we still want to keep added collections/fields so the database schema is consistent which is important for migrations.
      * If your plugin heavily modifies the database schema, you may want to remove this property.
@@ -69,19 +91,21 @@ export const otpPlugin =
       config.admin.components.beforeDashboard = []
     }
 
-    config.admin.components.beforeDashboard.push(
-      `otp-plugin/client#BeforeDashboardClient`,
-    )
-    config.admin.components.beforeDashboard.push(
-      `otp-plugin/rsc#BeforeDashboardServer`,
-    )
 
+    // New service-integrated endpoints
     config.endpoints.push({
-      handler: customEndpointHandler,
-      method: 'get',
-      path: '/my-plugin-endpoint',
+      handler: sendOtpEndpointHandler, 
+      method: 'post',
+      path: "/otp/send"
     })
 
+    config.endpoints.push({
+      handler: loginWithMobileEndpointHandler,
+      method: 'post',
+      path: "/otp/login"
+    })
+
+    // Store the hook in payload for access in endpoints
     const incomingOnInit = config.onInit
 
     config.onInit = async (payload) => {
@@ -90,22 +114,11 @@ export const otpPlugin =
         await incomingOnInit(payload)
       }
 
-      const { totalDocs } = await payload.count({
-        collection: 'plugin-collection',
-        where: {
-          id: {
-            equals: 'seeded-by-plugin',
-          },
-        },
-      })
-
-      if (totalDocs === 0) {
-        await payload.create({
-          collection: 'plugin-collection',
-          data: {
-            id: 'seeded-by-plugin',
-          },
-        })
+      // Store the afterSetOtp hook in payload for endpoint access
+      if (pluginOptions.afterSetOtp) {
+        payload.otpPluginHooks = {
+          afterSetOtp: pluginOptions.afterSetOtp
+        };
       }
     }
 
