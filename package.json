@@ -19,13 +19,13 @@
     "two-factor",
     "security"
   ],
-  "homepage": "https://github.com/your-username/payloadcms_otp_plugin#readme",
+  "homepage": "https://github.com/fahmihidayah/payloadcms_otp_plugin#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/your-username/payloadcms_otp_plugin.git"
+    "url": "git+https://github.com/fahmihidayah/payloadcms_otp_plugin.git"
   },
   "bugs": {
-    "url": "https://github.com/your-username/payloadcms_otp_plugin/issues"
+    "url": "https://github.com/fahmihidayah/payloadcms_otp_plugin/issues"
   },
   "type": "module",
   "exports": {
