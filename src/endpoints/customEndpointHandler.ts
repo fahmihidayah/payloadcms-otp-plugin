@@ -1,7 +1,7 @@
 import type { PayloadHandler, PayloadRequest } from 'payload'
 import { BaseResponse } from '../types/index.js'
 import { OTPService } from '../services/index.js'
-import { AfterSetOtpHook } from '../index.js'
+import { AfterSetOtpHook, OtpPluginConfig } from '../index.js'
 
 // Type augmentation for Payload
 declare module 'payload' {
@@ -9,6 +9,7 @@ declare module 'payload' {
     otpPluginHooks?: {
       afterSetOtp?: AfterSetOtpHook;
     };
+    otpPluginConfig?: OtpPluginConfig;
   }
 }
 
@@ -73,5 +74,18 @@ export const loginWithMobileEndpointHandler: PayloadHandler = async (req: Payloa
 
   } catch (error) {
     return handleError(error, 'Login with OTP');
+  }
+}
+
+export const getOtpConfigEndpointHandler: PayloadHandler = async (req: PayloadRequest): Promise<Response> => {
+  try {
+    const config = req.payload.otpPluginConfig;
+    const otpLength = config?.otpLength || 6;
+
+    const response = createResponse({ otpLength }, "OTP configuration retrieved successfully", true);
+    return Response.json(response, { status: 200 });
+
+  } catch (error) {
+    return handleError(error, 'Get OTP Config');
   }
 }

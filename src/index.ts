@@ -6,6 +6,7 @@ declare module 'payload' {
     otpPluginHooks?: {
       afterSetOtp?: AfterSetOtpHook;
     };
+    otpPluginConfig?: OtpPluginConfig;
   }
 }
 
@@ -15,6 +16,7 @@ import { enhanceUsersCollection } from './collections/enhanceUserCollection.js'
 import { 
   sendOtpEndpointHandler, 
   loginWithMobileEndpointHandler,
+  getOtpConfigEndpointHandler,
 } from './endpoints/customEndpointHandler.js'
 
 export type AfterSetOtpHook = (args: {
@@ -32,6 +34,10 @@ export type OtpPluginConfig = {
   collections?: Partial<Record<CollectionSlug, true>>
   disabled?: boolean,
   expiredTime: number,
+  /**
+   * Length of the OTP code (default: 6)
+   */
+  otpLength?: number,
   /**
    * Hook executed after OTP is created and stored
    */
@@ -105,6 +111,12 @@ export const otpPlugin =
       path: "/otp/login"
     })
 
+    config.endpoints.push({
+      handler: getOtpConfigEndpointHandler,
+      method: 'get',
+      path: "/otp/config"
+    })
+
     // Store the hook in payload for access in endpoints
     const incomingOnInit = config.onInit
 
@@ -114,6 +126,9 @@ export const otpPlugin =
         await incomingOnInit(payload)
       }
 
+      // Store the plugin configuration in payload for component access
+      payload.otpPluginConfig = pluginOptions;
+      
       // Store the afterSetOtp hook in payload for endpoint access
       if (pluginOptions.afterSetOtp) {
         payload.otpPluginHooks = {

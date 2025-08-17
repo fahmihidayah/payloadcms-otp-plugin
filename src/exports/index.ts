@@ -6,3 +6,8 @@ export {
   sendOtpEndpointHandler, 
   loginWithMobileEndpointHandler 
 } from '../endpoints/customEndpointHandler.js'
+
+// Components
+export { default as OtpPage } from '../components/otp/otp-page.js'
+export { default as OtpView } from '../components/otp/otp-view.js'
+export { default as OTPInput } from '../components/otp/otp-input.js'

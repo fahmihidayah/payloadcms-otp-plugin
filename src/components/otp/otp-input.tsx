@@ -13,7 +13,7 @@ interface OTPInputProps {
 }
 
 type OTPDigit = string;
-type OTPArray = [OTPDigit, OTPDigit, OTPDigit, OTPDigit, OTPDigit, OTPDigit];
+type OTPArray = OTPDigit[];
 
 const OTPInput: React.FC<OTPInputProps> = ({
   length = 6,
@@ -29,19 +29,23 @@ const OTPInput: React.FC<OTPInputProps> = ({
     while (initialOtp.length < length) {
       initialOtp.push('');
     }
-    return initialOtp as OTPArray;
+    return initialOtp;
   });
   
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
+  // Note: We don't update the array when length changes dynamically
+  // to avoid state management issues. The parent component should
+  // handle ensuring the correct length is passed from the start.
+
   // Reset OTP when onReset is called
   React.useEffect(() => {
     if (onReset) {
-      const resetOtp = ['', '', '', '', '', ''] as OTPArray;
+      const resetOtp = Array(length).fill('');
       setOtp(resetOtp);
       inputRefs.current[0]?.focus();
     }
-  }, [onReset]);
+  }, [onReset, length]);
 
   // Handle input change
   const handleInputChange = (index: number, inputValue: string): void => {
@@ -52,7 +56,7 @@ const OTPInput: React.FC<OTPInputProps> = ({
     // Only allow numeric input
     if (inputValue && !/^\d$/.test(inputValue)) return;
 
-    const newOtp: OTPArray = [...otp] as OTPArray;
+    const newOtp: OTPArray = [...otp];
     newOtp[index] = inputValue;
     setOtp(newOtp);
 

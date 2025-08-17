@@ -95,7 +95,9 @@ export class OTPService {
 
             await this.cleanupExpiredOTPs(credentials);
 
-            const otpCode = this.generateOTP();
+            // Get OTP length from plugin configuration
+            const otpLength = this.payload.otpPluginConfig?.otpLength || 6;
+            const otpCode = this.generateOTP(otpLength);
             await this.storeOTP(credentials, otpCode);
 
             // TODO: Integrate with SMS/Email service
