@@ -8,7 +8,7 @@ import { fileURLToPath } from 'url'
 
 import { testEmailAdapter } from './helpers/testEmailAdapter.js'
 import { seed } from './seed.js'
-import { otpPlugin } from 'otp-plugin'
+import { otpPlugin } from 'payloadcms_otp_plugin'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)

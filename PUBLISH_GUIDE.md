@@ -11,7 +11,7 @@
 
 ### ✅ Package Configuration
 - [x] Updated package.json with proper metadata
-- [x] Scoped package name: `@payloadcms/otp-plugin`
+- [x] Scoped package name: `payloadcms_otp_plugin`
 - [x] Author information: Muhammad Fahmi Hidayah
 - [x] Keywords for discoverability
 - [x] Repository and homepage URLs (update with actual GitHub repo)
@@ -66,7 +66,7 @@ pnpm publish:beta
 
 ## Package Information
 
-- **Name**: `@payloadcms/otp-plugin`
+- **Name**: `payloadcms_otp_plugin`
 - **Version**: 1.0.0
 - **Author**: Muhammad Fahmi Hidayah (m.fahmi.hidayah@gmail.com)
 - **License**: MIT
@@ -85,7 +85,7 @@ pnpm publish:beta
 ## Installation Command (Post-Publication)
 
 ```bash
-npm install @payloadcms/otp-plugin
+npm install payloadcms_otp_plugin
 ```
 
 ## Repository Structure

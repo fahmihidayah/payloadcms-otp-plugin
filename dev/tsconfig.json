@@ -19,13 +19,13 @@
       "@payload-config": [
         "./payload.config.ts"
       ],
-      "otp-plugin": [
+      "payloadcms_otp_plugin": [
         "../src/index.ts"
       ],
-      "otp-plugin/client": [
+      "payloadcms_otp_plugin/client": [
         "../src/exports/client.ts"
       ],
-      "otp-plugin/rsc": [
+      "payloadcms_otp_plugin/rsc": [
         "../src/exports/rsc.ts"
       ]
     },

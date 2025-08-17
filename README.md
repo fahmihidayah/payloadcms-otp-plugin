@@ -15,11 +15,11 @@ A comprehensive One-Time Password (OTP) authentication plugin for Payload CMS th
 ## Installation
 
 ```bash
-npm install @payloadcms/otp-plugin
+npm install payloadcms_otp_plugin
 # or
-yarn add @payloadcms/otp-plugin
+yarn add payloadcms_otp_plugin
 # or
-pnpm add @payloadcms/otp-plugin
+pnpm add payloadcms_otp_plugin
 ```
 
 ## Quick Start
@@ -30,7 +30,7 @@ Add the plugin to your Payload configuration:
 
 ```typescript
 import { buildConfig } from 'payload'
-import { otpPlugin } from '@payloadcms/otp-plugin'
+import { otpPlugin } from 'payloadcms_otp_plugin'
 
 export default buildConfig({
   // ... your existing config
@@ -47,7 +47,7 @@ export default buildConfig({
 
 ```typescript
 import { buildConfig } from 'payload'
-import { otpPlugin } from '@payloadcms/otp-plugin'
+import { otpPlugin } from 'payloadcms_otp_plugin'
 import { sendSMS, sendEmail } from './your-services'
 
 export default buildConfig({
@@ -171,7 +171,7 @@ Create a `middleware.ts` file in your project root:
 ```typescript
 // middleware.ts
 import { NextRequest, NextResponse } from 'next/server'
-import { middlewareOtp } from '@payloadcms/otp-plugin/middleware'
+import { middlewareOtp } from 'payloadcms_otp_plugin/middleware'
 
 export async function middleware(request: NextRequest): Promise<NextResponse> {
   // Apply OTP middleware for admin routes
@@ -227,7 +227,7 @@ You can extend the middleware for custom logic:
 
 ```typescript
 import { NextRequest, NextResponse } from 'next/server'
-import { middlewareOtp } from '@payloadcms/otp-plugin/middleware'
+import { middlewareOtp } from 'payloadcms_otp_plugin/middleware'
 
 export async function middleware(request: NextRequest): Promise<NextResponse> {
   const url = request.nextUrl
@@ -254,7 +254,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 The `middlewareOtp` function accepts optional configuration:
 
 ```typescript
-import { middlewareOtp } from '@payloadcms/otp-plugin/middleware'
+import { middlewareOtp } from 'payloadcms_otp_plugin/middleware'
 
 // Basic usage
 await middlewareOtp(request)
@@ -274,7 +274,7 @@ The plugin provides ready-to-use React components for OTP functionality.
 A complete OTP validation page with automatic configuration fetching.
 
 ```typescript
-import { OtpPage } from '@payloadcms/otp-plugin'
+import { OtpPage } from 'payloadcms_otp_plugin'
 
 // app/otp-validation/page.tsx
 export default function OTPValidationPage() {
@@ -309,7 +309,7 @@ A flexible client-side OTP input component with full control.
 
 ```typescript
 'use client'
-import { OtpView } from '@payloadcms/otp-plugin'
+import { OtpView } from 'payloadcms_otp_plugin'
 
 export default function CustomOTPPage() {
   return (
@@ -347,7 +347,7 @@ A standalone OTP input component for custom implementations.
 
 ```typescript
 'use client'
-import { OTPInput } from '@payloadcms/otp-plugin'
+import { OTPInput } from 'payloadcms_otp_plugin'
 import { useState } from 'react'
 
 export default function CustomOTPInput() {
@@ -451,7 +451,7 @@ Add custom CSS to style the OTP components:
 
 **Example 1: Custom OTP Page with Branding**
 ```typescript
-import { OtpView } from '@payloadcms/otp-plugin'
+import { OtpView } from 'payloadcms_otp_plugin'
 
 export default function BrandedOTPPage() {
   return (
@@ -477,7 +477,7 @@ export default function BrandedOTPPage() {
 ```typescript
 'use client'
 import { useState } from 'react'
-import { OTPInput } from '@payloadcms/otp-plugin'
+import { OTPInput } from 'payloadcms_otp_plugin'
 
 export default function MultiStepAuth() {
   const [step, setStep] = useState(1) // 1: phone, 2: otp, 3: success
@@ -811,7 +811,7 @@ afterSetOtp: async ({ otp, credentials, payload }) => {
 ```typescript
 // __tests__/OTPInput.test.tsx
 import { render, fireEvent, screen } from '@testing-library/react'
-import { OTPInput } from '@payloadcms/otp-plugin'
+import { OTPInput } from 'payloadcms_otp_plugin'
 
 describe('OTPInput', () => {
   it('should handle OTP completion', () => {
@@ -942,9 +942,9 @@ Email: m.fahmi.hidayah@gmail.com
 
 If you encounter any issues or have questions, please:
 
-1. Check the [documentation](https://github.com/your-username/payload-otp-plugin)
-2. Search [existing issues](https://github.com/your-username/payload-otp-plugin/issues)
-3. Create a [new issue](https://github.com/your-username/payload-otp-plugin/issues/new)
+1. Check the [documentation](https://github.com/fahmihidayah/payloadcms_otp_plugin)
+2. Search [existing issues](https://github.com/fahmihidayah/payloadcms_otp_plugin/issues)
+3. Create a [new issue](https://github.com/fahmihidayah/payloadcms_otp_plugin/issues/new)
 
 ---
 
