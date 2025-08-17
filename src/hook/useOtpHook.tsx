@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { toast, useTranslation } from "@payloadcms/ui"
 import { usePathname, useRouter } from "next/navigation.js";
 import { OtpTranslationsKeys, OtpTranslationsObject } from "src/translation/index.js";
-import { resendOtp, resetToken, sendOtp, submitOtp } from "../actions/index.js";
+import { resendOtp, resetToken, submitOtp } from "../actions/index.js";
 
 export default function useOtpHook() {
 
@@ -66,7 +66,7 @@ export default function useOtpHook() {
                 return true;
             } else {
                 toast.error(result.message || t("otp:session_ended"));
-                if (result.message.includes('token') || result.message.includes('expired')) {
+                if (result.message && (result.message.includes('token') || result.message.includes('expired'))) {
                     router.push("/admin/login");
                 }
                 return false;

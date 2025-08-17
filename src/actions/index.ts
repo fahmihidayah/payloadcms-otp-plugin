@@ -252,7 +252,10 @@ export async function getOtpConfig(): Promise<OtpConfig | undefined> {
       expiredTime: number;
     }> = await response.json();
     console.log('response ', result)
-    return result.data
+    return result.data || undefined
   }
+  
+  // Return undefined for failed requests
+  return undefined
 
 }

@@ -7,7 +7,7 @@ import OTPInput from './otp-input.js';
 import TimerCountdown from './timer-count-down.js';
 import useOtpHook from '../../hook/useOtpHook.js';
 import { OtpTranslationsKeys, OtpTranslationsObject } from 'src/translation/index.js';
-import { getOtpConfig, OtpConfig } from '../../actions/index.js';
+import { getOtpConfig } from '../../actions/index.js';
 
 // Type definitions
 interface OTPViewProps {
@@ -37,7 +37,10 @@ function OtpView({
   const { t } = useTranslation<OtpTranslationsObject, OtpTranslationsKeys>();
   const [otpLength, setOtpLength] = useState(propOtpLength || 6);
   const [expiredTime, setExpiredTime] = useState(propExpiredTime || initialTimer || 120);
-  const [isConfigLoaded, setIsConfigLoaded] = useState(!!(propOtpLength && propExpiredTime));
+  const [isConfigLoaded, setIsConfigLoaded] = useState(
+    // Only mark as loaded if both critical props are provided
+    !!(propOtpLength && (propExpiredTime || initialTimer))
+  );
 
   // Fetch OTP configuration only if not provided as props
   useEffect(() => {

@@ -43,7 +43,10 @@ const OTPInput: React.FC<OTPInputProps> = ({
     if (onReset) {
       const resetOtp = Array(length).fill('');
       setOtp(resetOtp);
-      inputRefs.current[0]?.focus();
+      // Use setTimeout to ensure DOM is updated before focusing
+      setTimeout(() => {
+        inputRefs.current[0]?.focus();
+      }, 0);
     }
   }, [onReset, length]);
 
