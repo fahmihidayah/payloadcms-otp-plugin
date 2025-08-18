@@ -5,11 +5,22 @@
     "resend": "Resend",
     "sending": "Sending...",
     "submit": "Submit",
-    "wrong_otp_code" : "You're submitting wrong OTP",
-    "failed_submitting_otp" : "Failed to submit OTP",
-    "new_otp_sent" : "New OTP sent to your email",
-    "session_ended" : "Your session has ended.",
-    "failed_to_send_otp" : "Failed to resend OTP",
+    "wrong_otp_code": "You're submitting wrong OTP",
+    "failed_submitting_otp": "Failed to submit OTP",
+    "new_otp_sent": "New OTP sent to your email",
+    "session_ended": "Your session has ended.",
+    "failed_to_send_otp": "Failed to resend OTP",
     "otp_sent_successfully": "OTP sent successfully to your email"
+  },
+  "api": {
+    "mobile_or_email_required": "Mobile or email is required",
+    "internal_server_error": "Internal server error",
+    "mobile_email_and_otp_required": "Mobile/email and OTP are required",
+    "otp_config_retrieved": "OTP configuration retrieved successfully",
+    "otp_sent_successfully": "OTP sent successfully",
+    "failed_to_send_otp": "Failed to send OTP",
+    "invalid_or_expired_otp": "Invalid or expired OTP",
+    "login_successful": "Login successful",
+    "login_failed": "Login failed"
   }
 }

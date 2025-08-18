@@ -3,6 +3,11 @@ import { arTranslations } from '@payloadcms/translations/languages/ar'
 import type { NestedKeysStripped } from '@payloadcms/translations'
 import { readFileSync } from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 // import enLocale from './en.json';
 // import arLocale from "./ar.json";
 const enLocale = JSON.parse(

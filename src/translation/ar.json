@@ -9,7 +9,19 @@
     "failed_submitting_otp": "فشل في إرسال رمز التحقق",
     "new_otp_sent": "تم إرسال رمز تحقق جديد إلى بريدك الإلكتروني",
     "session_ended": "انتهت جلستك.",
-    "failed_to_send_otp": "فشل في إعادة إرسال رمز التحقق"
+    "failed_to_send_otp": "فشل في إعادة إرسال رمز التحقق",
+    "otp_sent_successfully": "تم إرسال رمز التحقق بنجاح إلى بريدك الإلكتروني"
+  },
+  "api": {
+    "mobile_or_email_required": "رقم الجوال أو البريد الإلكتروني مطلوب",
+    "internal_server_error": "خطأ داخلي في الخادم",
+    "mobile_email_and_otp_required": "رقم الجوال/البريد الإلكتروني ورمز التحقق مطلوبان",
+    "otp_config_retrieved": "تم استرداد إعدادات رمز التحقق بنجاح",
+    "otp_sent_successfully": "تم إرسال رمز التحقق بنجاح",
+    "failed_to_send_otp": "فشل في إرسال رمز التحقق",
+    "invalid_or_expired_otp": "رمز التحقق غير صحيح أو منتهي الصلاحية",
+    "login_successful": "تم تسجيل الدخول بنجاح",
+    "login_failed": "فشل في تسجيل الدخول"
   }
 }
 

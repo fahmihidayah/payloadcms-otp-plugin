@@ -1,6 +1,7 @@
 import { jwtSign, PayloadRequest } from "payload";
 import { addUserSession } from "../utilities/session.js";
 import { AfterSetOtpHook } from "../index.js";
+import { createTranslationHelper } from "../utilities/translation.js";
 
 interface OTPCredentials {
     mobile?: string;
@@ -86,12 +87,14 @@ export class OTPService {
         return otpRecord;
     }
 
-    async sendOTP(credentials: OTPCredentials): Promise<ServiceResponse> {
+    async sendOTP(credentials: OTPCredentials, headers?: Headers): Promise<ServiceResponse> {
         try {
+            const { t } = createTranslationHelper(headers || new Headers());
+            
             if (!credentials.mobile && !credentials.email) {
                 return {
                     success: false,
-                    message: 'Mobile or email is required'
+                    message: t('api.mobile_or_email_required')
                 };
             }
 
@@ -107,13 +110,14 @@ export class OTPService {
 
             return {
                 success: true,
-                message: 'OTP sent successfully'
+                message: t('api.otp_sent_successfully')
             };
         } catch (error) {
             console.error('Error sending OTP:', error);
+            const { t } = createTranslationHelper(headers || new Headers());
             return {
                 success: false,
-                message: 'Failed to send OTP'
+                message: t('api.failed_to_send_otp')
             };
         }
     }
@@ -222,22 +226,23 @@ export class OTPService {
         return token.token;
     }
 
-    async loginWithOTP(credentials: LoginCredentials): Promise<ServiceResponse<LoginResponse>> {
+    async loginWithOTP(credentials: LoginCredentials, headers?: Headers): Promise<ServiceResponse<LoginResponse>> {
         try {
+            const { t } = createTranslationHelper(headers || new Headers());
+            
             if ((!credentials.mobile && !credentials.email) || !credentials.otp) {
                 return {
                     success: false,
-                    message: 'Mobile/email and OTP are required'
+                    message: t('api.mobile_email_and_otp_required')
                 };
             }
 
             const { isValid } = await this.verifyOTP(credentials);
 
-
             if (!isValid) {
                 return {
                     success: false,
-                    message: 'Invalid or expired OTP'
+                    message: t('api.invalid_or_expired_otp')
                 };
             }
 
@@ -246,14 +251,15 @@ export class OTPService {
 
             return {
                 success: true,
-                message: 'Login successful',
+                message: t('api.login_successful'),
                 data: { token, user }
             };
         } catch (error) {
             console.error('Error during OTP login:', error);
+            const { t } = createTranslationHelper(headers || new Headers());
             return {
                 success: false,
-                message: 'Login failed'
+                message: t('api.login_failed')
             };
         }
     }
