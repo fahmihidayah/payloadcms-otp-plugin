@@ -18,6 +18,7 @@ import {
   loginWithMobileEndpointHandler,
   getOtpConfigEndpointHandler,
 } from './endpoints/customEndpointHandler.js'
+import { otpTranslation } from './translation/index.js'
 
 export type AfterSetOtpHook = (args: {
   otp: string;
@@ -97,6 +98,21 @@ export const otpPlugin =
       config.admin.components.beforeDashboard = []
     }
 
+    // Add translations if i18n is configured
+    if (config.i18n && config.i18n.translations) {
+      // Merge translations if i18n already exists
+      config.i18n.translations = {
+        ...config.i18n.translations,
+        en: {
+          ...config.i18n.translations?.en,
+          ...otpTranslation.en
+        },
+        ar: {
+          ...config.i18n.translations?.ar,
+          ...otpTranslation.ar
+        }
+      }
+    }
 
     // New service-integrated endpoints
     config.endpoints.push({

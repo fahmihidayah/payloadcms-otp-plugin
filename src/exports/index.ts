@@ -15,3 +15,7 @@ export { default as OTPInput } from '../components/otp/otp-input.js'
 // Actions and Types
 export { getOtpConfig, sendOtp, submitOtp, resendOtp, resetToken } from '../actions/index.js'
 export type { OtpConfig } from '../actions/index.js'
+
+// Translations
+export { otpTranslation, baseOtpTranslation } from '../translation/index.js'
+export type { OtpTranslationsObject, OtpTranslationsKeys } from '../translation/index.js'

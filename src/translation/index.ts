@@ -21,18 +21,31 @@ export const baseOtpTranslation = {
   ar: arLocale
 }
 
+// Flatten translations with namespace prefixes for Payload translation system
+const flattenTranslations = (obj: any, prefix = '') => {
+  const flattened: any = {}
+  for (const key in obj) {
+    if (typeof obj[key] === 'object' && obj[key] !== null) {
+      Object.assign(flattened, flattenTranslations(obj[key], prefix ? `${prefix}:${key}` : key))
+    } else {
+      flattened[prefix ? `${prefix}:${key}` : key] = obj[key]
+    }
+  }
+  return flattened
+}
+
 // Merge custom translations with base translations
 export const otpTranslation = {
   en: {
     ...enTranslations,
-    ...baseOtpTranslation.en,
+    ...flattenTranslations(baseOtpTranslation.en),
   },
   ar: {
     ...arTranslations,
-    ...baseOtpTranslation.ar,
+    ...flattenTranslations(baseOtpTranslation.ar),
   }
 }
 
-export type OtpTranslationsObject = typeof baseOtpTranslation.en & typeof enTranslations
+export type OtpTranslationsObject = typeof otpTranslation.en
 
 export type OtpTranslationsKeys = NestedKeysStripped<OtpTranslationsObject>
